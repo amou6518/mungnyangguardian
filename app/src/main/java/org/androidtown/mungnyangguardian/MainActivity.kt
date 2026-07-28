@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -18,8 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 
 // 컬러 팔레트
 private val Cream = Color(0xFFFFFCF7)
@@ -31,6 +35,7 @@ private val Red = Color(0xFFE95D4D)
 private val LightPurple = Color(0xFFEDEBFA)
 private val Blue = Color(0xFFE9F1FF)
 private val Orange = Color(0xFFFFF0EC)
+private val AlertRed = Color(0xFFD34F4F)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,26 +102,148 @@ fun MungNyangApp() {
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+
+    var showWarningDialog by remember { mutableStateOf(false) }
+
+    if (showWarningDialog) {
+        WarningDialog(onDismiss = { showWarningDialog = false })
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(25.dp)
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 80.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item { TopBar() }
         item { SafetyCard() }
+
         item {
-            SectionTitle("실시간 라이브", "")
-            Spacer(Modifier.height(20.dp))
-            LiveCameraCard()
+            Column {
+                SectionTitle("실시간 라이브", "")
+                Spacer(Modifier.height(16.dp))
+                LiveCameraCard()
+            }
         }
         item {
-            SectionTitle("AI 상태 요약", "더보기 ›")
-            Spacer(Modifier.height(20.dp))
-            AiStatusRow()
+            Column {
+                SectionTitle("AI 상태 요약", "더보기 ›")
+                Spacer(Modifier.height(16.dp))
+                AiStatusRow()
+            }
         }
+
         item {
-            Spacer(Modifier.height(20.dp))
-            QuickActionGrid()
+            QuickActionGrid(onWarningClick = { showWarningDialog = true })
+        }
+    }
+}
+
+@Composable
+fun WarningDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 50.dp, bottom = 20.dp, start = 20.dp, end = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.alert_red),
+                            contentDescription = "경고",
+                            tint = AlertRed,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "위험 상황이 감지되었어요!",
+                            color = AlertRed,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "전선에 접근하고 있어요.\n로봇이 차단 중이에요.",
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 22.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Image(
+                        painter = painterResource(R.drawable.danger),
+                        contentDescription = "위험 상황 사진",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { /* TODO: 상세보기 이동 이벤트 */ },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Green)
+                        ) {
+                            Text(text = "상세 보기", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+
+                        Button(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Orange)
+                        ) {
+                            Text(text = "확인", color = Brown, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(86.dp)
+                    .align(Alignment.TopCenter)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .border(2.dp, Color.White, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.dogtori),
+                    contentDescription = "프로필",
+                    modifier = Modifier.size(76.dp)
+                )
+            }
         }
     }
 }
@@ -331,14 +458,14 @@ fun StatusBox(
 }
 
 @Composable
-fun QuickActionGrid() {
+fun QuickActionGrid(onWarningClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         QuickButton(R.drawable.speak, "TTS", LightGreen, modifier = Modifier.weight(1f))
         QuickButton(R.drawable.play, "간식 타임", Blue, modifier = Modifier.weight(1f))
-        QuickButton(R.drawable.alert, "경고 보내기", Orange, modifier = Modifier.weight(1f))
+        QuickButton(R.drawable.alert, "경고 보내기", Orange, modifier = Modifier.weight(1f), onClick = onWarningClick)
     }
 }
 
@@ -347,10 +474,11 @@ fun QuickButton(
     iconRes: Int,
     title: String,
     bgColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier ,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable { onClick() },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = bgColor)
     ) {
