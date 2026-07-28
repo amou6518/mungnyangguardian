@@ -89,6 +89,7 @@ fun MungNyangApp() {
             0 -> HomeScreen(Modifier.padding(padding))
             1 -> MapScreen(Modifier.padding(padding))
             2 -> LogScreen(Modifier.padding(padding))
+            3 -> SettingScreen(Modifier.padding(padding))
             else -> ComingSoonScreen(Modifier.padding(padding))
         }
     }
