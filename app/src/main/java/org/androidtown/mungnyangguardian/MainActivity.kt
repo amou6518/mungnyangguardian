@@ -88,6 +88,7 @@ fun MungNyangApp() {
         when (selectedTab) {
             0 -> HomeScreen(Modifier.padding(padding))
             1 -> MapScreen(Modifier.padding(padding))
+            2 -> LogScreen(Modifier.padding(padding))
             else -> ComingSoonScreen(Modifier.padding(padding))
         }
     }
