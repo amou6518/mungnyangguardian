@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.delay
 
 // 컬러 팔레트
 private val Cream = Color(0xFFFFFCF7)
@@ -49,11 +50,38 @@ class MainActivity : ComponentActivity() {
                     surface = Color.White
                 )
             ) {
-                MungNyangApp()
+                var showSplash by remember { mutableStateOf(true) }
+
+                LaunchedEffect(Unit) {
+                    delay(5000L)
+                    showSplash = false
+                }
+
+                if (showSplash) {
+                    SplashScreen()
+                } else {
+                    MungNyangApp()
+                }
             }
         }
     }
 }
+@Composable
+fun SplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.loading),
+            contentDescription = "앱 로딩 화면",
+            modifier = Modifier.size(250.dp)
+        )
+    }
+}
+
 
 @Composable
 fun MungNyangApp() {
